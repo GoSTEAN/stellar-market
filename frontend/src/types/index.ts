@@ -64,6 +64,13 @@ export interface Review {
   createdAt: string;
 }
 
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
 export interface UserProfile extends User {
   reviewsReceived: Review[];
   clientJobs: Job[];
