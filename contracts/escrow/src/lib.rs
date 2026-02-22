@@ -179,7 +179,6 @@ impl EscrowContract {
             .persistent()
             .get(&get_job_key(job_id))
             .ok_or(EscrowError::JobNotFound)?;
-        bump_job_ttl(&env, job_id);
 
         if job.status == JobStatus::Created
             || job.status == JobStatus::Completed
@@ -219,7 +218,6 @@ impl EscrowContract {
         }
 
         env.storage().persistent().set(&get_job_key(job_id), &job);
-        bump_job_ttl(&env, job_id);
 
         env.events().publish(
             (symbol_short!("escrow"), symbol_short!("dispute")),
