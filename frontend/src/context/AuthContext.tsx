@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       setUser(res.data);
       localStorage.setItem(USER_KEY, JSON.stringify(res.data));
-    } catch (error: any) {
+    } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (error.response?.status === 401) {
         logout();
       }
