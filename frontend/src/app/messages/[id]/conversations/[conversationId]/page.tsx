@@ -15,7 +15,7 @@ export default function ConversationPage() {
   const { token, user: currentUser } = useAuth();
   const partnerId = params?.conversationId as string;
 
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([]); // eslint-disable-line @typescript-eslint/no-explicit-any
   const [partnerUsername, setPartnerUsername] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +28,7 @@ export default function ConversationPage() {
     }
 
     axios
-      .get<any[]>(`${API}/messages/${partnerId}`, {
+      .get<any[]>(`${API}/messages/${partnerId}`, { // eslint-disable-line @typescript-eslint/no-explicit-any
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {

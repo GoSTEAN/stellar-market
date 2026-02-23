@@ -11,7 +11,6 @@ import { Send } from "lucide-react";
 import { useSocket } from "@/context/SocketContext";
 import TypingIndicator from "./TypingIndicator";
 
-const TOKEN_KEY = "stellarmarket_jwt";
 const TYPING_DEBOUNCE_MS = 1500;
 
 export interface ChatMessage {
@@ -158,17 +157,15 @@ export default function ChatWindow({
               className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm leading-relaxed ${
-                  isOwn
+                className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm leading-relaxed ${isOwn
                     ? "bg-stellar-blue text-white rounded-br-sm"
                     : "bg-dark-card text-dark-text border border-dark-border rounded-bl-sm"
-                }`}
+                  }`}
               >
                 {msg.content}
                 <div
-                  className={`text-xs mt-1 ${
-                    isOwn ? "text-blue-200" : "text-dark-muted"
-                  }`}
+                  className={`text-xs mt-1 ${isOwn ? "text-blue-200" : "text-dark-muted"
+                    }`}
                 >
                   {new Date(msg.createdAt).toLocaleTimeString([], {
                     hour: "2-digit",

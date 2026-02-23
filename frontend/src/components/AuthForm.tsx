@@ -62,7 +62,7 @@ export default function AuthForm({ type }: AuthFormProps) {
         if (!response.ok) throw new Error(data.message || "Registration failed");
         register(data.token, data.user);
       }
-    } catch (err: any) {
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       setError(err.message);
     } finally {
       setIsLoading(false);
@@ -223,7 +223,7 @@ export default function AuthForm({ type }: AuthFormProps) {
         <p className="text-dark-muted">
           {type === "login" ? (
             <>
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link
                 href="/auth/register"
                 className="text-stellar-blue hover:underline font-medium"

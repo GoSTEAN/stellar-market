@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import {
-  Wallet,
   Menu,
   X,
   MessageSquare,
@@ -11,19 +10,18 @@ import {
   PenLine,
   LogOut,
   User as UserIcon,
-  Loader2,
   Settings,
 } from "lucide-react";
 import axios from "axios";
 import { useState, useRef, useEffect } from "react";
-import { useWallet, truncateAddress } from "@/context/WalletContext";
+import { useWallet } from "@/context/WalletContext";
 import { useSocket } from "@/context/SocketContext";
 import { useAuth } from "@/context/AuthContext";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api";
 
 function UserMenu({ className }: { className?: string }) {
-  const { address, connect, disconnect } = useWallet();
+  const { disconnect } = useWallet();
   const { user, logout, isLoading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
