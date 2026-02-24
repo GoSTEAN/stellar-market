@@ -11,6 +11,153 @@ impl DummyEscrow {
     pub fn resolve_dispute_callback(_env: Env, _job_id: u64, _resolved_for_client: bool) {}
 }
 
+// Mock reputation contract for testing
+#[contract]
+pub struct MockReputationContract;
+
+#[contractimpl]
+impl MockReputationContract {
+    pub fn get_reputation(
+        _env: Env,
+        user: Address,
+    ) -> Result<reputation::UserReputation, soroban_sdk::Error> {
+        // Mock: Return high reputation for all users in tests
+        // In real tests, you would use more sophisticated mocking
+        Ok(reputation::UserReputation {
+            user: user.clone(),
+            total_score: 500,
+            total_weight: 10,
+            review_count: 5,
+        })
+    }
+}
+
+#[test]
+fn test_initialize_contract() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let dispute_contract_id = env.register_contract(None, DisputeContract);
+    let client = DisputeContractClient::new(&env, &dispute_contract_id);
+
+    let reputation_contract_id = env.register_contract(None, MockReputationContract);
+    let admin = Address::generate(&env);
+
+    client.initialize(&admin, &reputation_contract_id, &300);
+
+    // Verify initialization by checking if we can set min reputation
+    client.set_min_voter_reputation(&admin, &400);
+}
+
+#[test]
+#[should_panic(expected = "Error(Contract, #2)")]
+fn test_initialize_twice_fails() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let dispute_contract_id = env.register_contract(None, DisputeContract);
+    let client = DisputeContractClient::new(&env, &dispute_contract_id);
+
+    let reputation_contract_id = env.register_contract(None, MockReputationContract);
+    let admin = Address::generate(&env);
+
+    client.initialize(&admin, &reputation_contract_id, &300);
+    // Try to initialize again - should fail
+    client.initialize(&admin, &reputation_contract_id, &300);
+}
+
+#[test]
+fn test_set_min_voter_reputation() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let dispute_contract_id = env.register_contract(None, DisputeContract);
+    let client = DisputeContractClient::new(&env, &dispute_contract_id);
+
+    let reputation_contract_id = env.register_contract(None, MockReputationContract);
+    let admin = Address::generate(&env);
+
+    client.initialize(&admin, &reputation_contract_id, &300);
+    client.set_min_voter_reputation(&admin, &500);
+}
+
+#[test]
+#[should_panic(expected = "Error(Contract, #2)")]
+fn test_set_min_voter_reputation_non_admin_fails() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let dispute_contract_id = env.register_contract(None, DisputeContract);
+    let client = DisputeContractClient::new(&env, &dispute_contract_id);
+
+    let reputation_contract_id = env.register_contract(None, MockReputationContract);
+    let admin = Address::generate(&env);
+    let non_admin = Address::generate(&env);
+
+    client.initialize(&admin, &reputation_contract_id, &300);
+    // Non-admin tries to set min reputation - should fail
+    client.set_min_voter_reputation(&non_admin, &500);
+}
+
+#[test]
+fn test_is_eligible_voter_high_reputation() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let dispute_contract_id = env.register_contract(None, DisputeContract);
+    let client = DisputeContractClient::new(&env, &dispute_contract_id);
+
+    let reputation_contract_id = env.register_contract(None, MockReputationContract);
+    let admin = Address::generate(&env);
+
+    client.initialize(&admin, &reputation_contract_id, &300);
+
+    let voter = Address::generate(&env);
+    
+    let is_eligible = client.is_eligible_voter(&voter);
+    // Mock returns high reputation for all users
+    assert_eq!(is_eligible, true);
+}
+
+#[test]
+fn test_vote_with_reputation_check() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let dispute_contract_id = env.register_contract(None, DisputeContract);
+    let client = DisputeContractClient::new(&env, &dispute_contract_id);
+
+    let reputation_contract_id = env.register_contract(None, MockReputationContract);
+    let admin = Address::generate(&env);
+
+    client.initialize(&admin, &reputation_contract_id, &300);
+
+    let user_client = Address::generate(&env);
+    let freelancer = Address::generate(&env);
+
+    let dispute_id = client.raise_dispute(
+        &1u64,
+        &user_client,
+        &freelancer,
+        &user_client,
+        &String::from_str(&env, "Issue"),
+        &3u32,
+    );
+
+    // Vote with reputation check - should succeed with mock
+    let voter = Address::generate(&env);
+    
+    client.cast_vote(
+        &dispute_id,
+        &voter,
+        &VoteChoice::Client,
+        &String::from_str(&env, "Vote"),
+    );
+
+    let dispute = client.get_dispute(&dispute_id);
+    assert_eq!(dispute.votes_for_client, 1);
+}
+
 #[test]
 fn test_raise_dispute() {
     let env = Env::default();
