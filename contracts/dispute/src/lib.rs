@@ -269,7 +269,6 @@ impl DisputeContract {
             appeal_deadline: 0,
             resolution_timestamp: 0,
             dispute_fee,
-            token,
             malicious: false,
         };
 
