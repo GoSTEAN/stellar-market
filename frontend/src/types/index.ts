@@ -16,6 +16,8 @@ export interface Milestone {
   amount: number;
   status: "PENDING" | "IN_PROGRESS" | "SUBMITTED" | "APPROVED" | "REJECTED";
   order: number;
+  onChainIndex?: number;
+  contractDeadline?: string;
 }
 
 export interface Job {
@@ -28,6 +30,8 @@ export interface Job {
   client: User;
   freelancer?: User;
   milestones: Milestone[];
+  contractJobId?: string;
+  escrowStatus: "UNFUNDED" | "FUNDED" | "COMPLETED" | "CANCELLED" | "DISPUTED";
   createdAt: string;
   _count?: { applications: number };
 }
