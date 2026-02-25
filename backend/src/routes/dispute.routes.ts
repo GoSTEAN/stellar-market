@@ -1,4 +1,4 @@
-import { Router, Response } from "express";
+import { Router, Request, Response } from "express";
 import { PrismaClient, JobStatus, DisputeStatus } from "@prisma/client";
 import { authenticate, AuthRequest } from "../middleware/auth";
 import { asyncHandler } from "../middleware/error";
@@ -10,7 +10,7 @@ const router = Router();
 const prisma = new PrismaClient();
 
 // Get all disputes (for community voters)
-router.get("/", asyncHandler(async (req, res) => {
+router.get("/", asyncHandler(async (req: Request, res: Response) => {
   const disputes = await prisma.dispute.findMany({
     include: {
       job: { select: { title: true, budget: true } },
@@ -23,9 +23,9 @@ router.get("/", asyncHandler(async (req, res) => {
 }));
 
 // Get specific dispute details
-router.get("/:id", asyncHandler(async (req, res) => {
+router.get("/:id", asyncHandler(async (req: Request, res: Response) => {
   const dispute = await prisma.dispute.findUnique({
-    where: { id: req.params.id },
+    where: { id: req.params.id as string },
     include: {
       job: { include: { client: true, freelancer: true } },
       initiator: { select: { username: true, walletAddress: true, id: true, avatarUrl: true } },

@@ -9,7 +9,7 @@ export const raiseDisputeSchema = z.object({
 export const castVoteSchema = z.object({
   disputeId: z.string().cuid({ message: "Invalid dispute ID format" }),
   choice: z.enum(["CLIENT", "FREELANCER"], { 
-    errorMap: () => ({ message: "Choice must be either CLIENT or FREELANCER" }) 
+    message: "Choice must be either CLIENT or FREELANCER" 
   }),
   reason: z.string().min(10, { message: "Please provide a reason for your vote" }),
 });
